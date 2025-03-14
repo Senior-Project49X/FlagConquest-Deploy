@@ -1,0 +1,60 @@
+name: flagconquest
+services:
+  fcq-frontend:
+    image: nunu111/flagconquest-frontend:latest
+    container_name: fcq-frontend
+    env_file:
+      - "./.env"
+    ports:
+      - ${FRONTEND_PORT}:3000
+    depends_on:
+      - fcq-backend
+    networks:
+      - nginx-frontend-backend
+    restart: always
+
+  fcq-backend:
+    container_name: fcq-backend
+    image: nunu111/flagconquest-backend:latest
+    ports:
+      - ${BACKEND_PORT}:${BACKEND_CONTAINER_PORT}
+    env_file:
+      - "./.env"
+    depends_on:
+      fcq-postgresdb:
+        condition: service_healthy
+    volumes:
+      - upload_data:/usr/src/app/uploads
+    networks:
+      - nginx-frontend-backend
+      - backend-db
+    restart: always
+
+  fcq-postgresdb:
+    image: postgres:17.3-alpine
+    container_name: fcq-postgresdb
+    ports:
+      - ${POSTGRES_PORT}:5432
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend-db
+    restart: always
+networks:
+  backend-db:
+    driver: bridge
+  nginx-frontend-backend:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  upload_data:
