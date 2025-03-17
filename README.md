@@ -4,8 +4,8 @@ This readme will show instruction how to deploy Flagconquest website with docker
 
 1. Copy `env.template` to `.env` file.
 2. Edit the following variables in the .env file accordingly. (On this part please contact professor to get these value)
-- `CLIENT ID`
-- `CLIENT SECRET`
+- `CMU_ENTRAID_CLIENT_ID`
+- `CMU_ENTRAID_CLIENT_SECRET`
 - `CMU_ENTRAID_REDIRECT_URL`
 3. run command below to start server
   ```bash
